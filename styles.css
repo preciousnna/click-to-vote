@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Minimalist Letter Envelope with Heart Scatter Effect</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+  /* Reset and base */
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: #faf7f2;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  .container {
+    position: relative;
+    width: 320px;
+    height: 220px;
+    perspective: 900px;
+  }
+
+  /* Envelope base */
+  .envelope {
+    position: relative;
+    width: 320px;
+    height: 220px;
+    background: #fff;
+    border-radius: 0 0 16px 16px;
+    box-shadow:
+      inset 0 -4px 10px #d9c7b3,
+      0 10px 22px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+  }
+
+  /* Envelope flap */
+  .flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 320px;
+    height: 110px;
+    background: #7b5e3c; /* rich brown */
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 4px 15px rgba(123, 94, 60, 0.6);
+    transform-origin: bottom center;
+    cursor: pointer;
+    transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .flap.open {
+    transform: rotateX(-180deg);
+    box-shadow: 0 15px 18px rgba(123, 94, 60, 0.9);
+  }
+
+  /* Heart shape on flap */
+  .heart {
+    position: relative;
+    width: 44px;
+    height: 40px;
+    transform: rotate(-45deg);
+  }
+
+  .heart:before,
+  .heart:after {
+    content: "";
+    position: absolute;
+    width: 44px;
+    height: 40px;
+    background: #b2875b;
+    border-radius: 50%;
+    transition: opacity 0.3s;
+  }
+
+  .heart:before {
+    top: 0;
+    left: 0;
+  }
+
+  .heart:after {
+    top: 0;
+    right: 0;
+  }
+
+  /* Instruction text */
+  .instruction {
+    position: absolute;
+    top: -40px;
+    width: 320px;
+    color: #8b6e4b;
+    font-weight: 600;
+    font-size: 20px;
+    text-align: center;
+    user-select: none;
+    text-shadow:
+      0 0 4px #c6b9a3;
+  }
+
+  /* Heart Scatter Container */
+  .heart-scatter-container {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    overflow: visible;
+    z-index: 10;
+  }
+
+  /* Small hearts for scatter */
+  .scatter-heart {
+    position: absolute;
+    width: 16px;
+    height: 14px;
+    transform: rotate(-45deg);
+    opacity: 0;
+  }
+  .scatter-heart:before,
+  .scatter-heart:after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 14px;
+    background: #b2875b;
+    border-radius: 50%;
+  }
+  .scatter-heart:before {
+    top: 0;
+    left: 0;
+  }
+  .scatter-heart:after {
+    top: 0;
+    right: 0;
+  }
+
+  /* Scatter animation */
+  @keyframes fly-away {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) rotate(-45deg) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--tx), var(--ty)) rotate(var(--r)) scale(0.3);
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" aria-label="Minimalist letter envelope with heart scatter effect">
+  <div class="instruction">Click to open</div>
+  <div class="envelope" role="img" aria-hidden="true">
+    <div class="flap" id="flap" title="Click to open envelope flap" role="button" tabindex="0" aria-pressed="false" aria-label="Envelope flap">
+      <div class="heart" id="mainHeart"></div>
+      <div class="heart-scatter-container" id="heartScatter"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const flap = document.getElementById('flap');
+  const heartScatter = document.getElementById('heartScatter');
+  const mainHeart = document.getElementById('mainHeart');
+
+  let isOpen = false;
+
+  function createScatterHearts(count = 12) {
+    heartScatter.innerHTML = '';
+    for(let i=0; i<count; i++) {
+      const heart = document.createElement('div');
+      heart.classList.add('scatter-heart');
+
+      // Random angle -45deg base plus randomness
+      const angle = -45;
+      // Generate random x/y translation between -120px and +120px
+      const tx = (Math.random()*240 - 120).toFixed(2) + 'px';
+      const ty = (Math.random()*(-150) + -40).toFixed(2) + 'px'; // scatter mostly upward
+
+      // Random rotation between -360deg to +360deg
+      const r = (Math.random()*720 - 360).toFixed(2) + 'deg';
+
+      heart.style.setProperty('--tx', tx);
+      heart.style.setProperty('--ty', ty);
+      heart.style.setProperty('--r', r);
+
+      heartScatter.appendChild(heart);
+    }
+  }
+
+  function triggerScatterAnimation() {
+    createScatterHearts();
+
+    const hearts = heartScatter.children;
+    for(let i=0; i<hearts.length; i++) {
+      const heart = hearts[i];
+      heart.style.animation = 'none';
+      // Trigger reflow:
+      void heart.offsetWidth;
+      // Animate with fly-away with staggered delay
+      heart.style.animation = `fly-away 1000ms forwards ease-out`;
+      heart.style.animationDelay = `${i * 80}ms`;
+    }
+  }
+
+  function openEnvelope() {
+    if (isOpen) return;
+    isOpen = true;
+
+    flap.classList.add('open');
+    flap.setAttribute('aria-pressed', 'true');
+
+    // Fade out the main heart
+    mainHeart.style.opacity = '0';
+
+    // Trigger heart scatter animation
+    triggerScatterAnimation();
+  }
+
+  flap.addEventListener('click', openEnvelope);
+  flap.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openEnvelope();
+    }
+  });
+</script>
+
+</body>
+</html>
