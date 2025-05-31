@@ -1,11 +1,9 @@
-
-
-     <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Letter to Jay - Realistic Envelope</title>
+<title>Letter to Jay - Fading Folder Reveal</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
@@ -22,7 +20,7 @@
     overflow-x: hidden;
   }
 
-  /* Container to hold envelope and letter */
+  /* Container to hold folder and letter */
   .container {
     position: relative;
     width: 750px;
@@ -31,8 +29,8 @@
     perspective: 1200px;
   }
 
-  /* Realistic envelope base */
-  .envelope {
+  /* Folder base */
+  .folder {
     width: 750px;
     max-width: 100%;
     height: 480px;
@@ -48,65 +46,46 @@
     z-index: 10;
   }
 
-  /* Envelope flap - realistic triangular shape */
+  /* Folder flap */
   .flap {
     position: absolute;
     top: 0;
     left: 0;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 160px 375px 0 375px;
-    border-color: #7b5e3c transparent transparent transparent;
-    border-radius: 12px 12px 0 0;
-    transform-origin: bottom center;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 8px;
     cursor: pointer;
     transition: transform 1s ease;
-    filter: drop-shadow(0 5px 3px rgba(0,0,0,0.2));
     z-index: 15;
   }
   .flap.open {
-    transform: rotateX(-180deg);
+    transform: rotateY(-180deg);
   }
 
-  /* Heart on flap - realistic small heart in center */
-  .heart {
-    position: absolute;
-    top: 24px;
-    left: 50%;
-    transform: translateX(-50%) rotate(-45deg);
-    width: 48px;
-    height: 44px;
-  }
-  .heart:before,
-  .heart:after {
-    content: "";
-    position: absolute;
-    width: 48px;
-    height: 44px;
-    background: #b2875bcc;
-    border-radius: 50%;
-  }
-  .heart:before {
-    top: 0;
-    left: 0;
-  }
-  .heart:after {
-    top: 0;
-    right: 0;
-  }
-
-  /* Letter area inside envelope - initially clipped to envelope area and hidden */
-  .letter {
+  /* Letter wrapper inside folder */
+  .letter-wrapper {
     position: absolute;
     top: 160px;
     left: 50%;
     width: 680px;
-    height: 300px;
+    height: 60px; /* show only top part initially */
     max-width: 100%;
+    overflow: hidden;
+    border-radius: 0 0 8px 8px;
+    box-sizing: border-box;
+    transition: transform 1.5s ease 0.5s;
+    background: transparent;
+    z-index: 12;
+  }
+  .letter-wrapper.expanded {
+    transform: translateY(-240px); /* move letter up */
+  }
+
+  /* Letter inside letter-wrapper */
+  .letter {
     background: #fefcf7;
     border: 2px solid #c9b89f;
-    border-radius: 0 0 8px 8px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.1);
     color: #2e2a25;
     padding: 40px 48px 48px 48px;
@@ -114,68 +93,10 @@
     font-family: 'Special Elite', Courier, monospace;
     font-size: 18px;
     line-height: 1.5;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1s ease 0.8s, transform 1s ease 0.8s;
-    overflow-y: auto;
-    z-index: 5;
-  }
-  .letter.open {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Letter content styles */
-  .letter-greeting {
-    margin-bottom: 14px;
-    font-weight: 600;
-    font-size: 22px;
-  }
-  .letter-body p {
-    margin: 0 0 14px 0;
-    white-space: pre-wrap;
-  }
-  .signature {
-    margin-top: 36px;
-    font-weight: bold;
-    font-size: 1.4rem;
+    border-radius: 0 0 8px 8px;
     user-select: text;
-  }
-
-  /* After envelope removed, letter container expands and center letter nicely */
-  .letter-container {
-    position: relative;
-    width: 680px;
-    max-width: 95vw;
-    max-height: 85vh;
-    background: #fefcf7;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    padding: 40px 48px 48px 48px;
-    box-sizing: border-box;
-    font-family: 'Special Elite', Courier, monospace;
-    font-size: 20px;
-    line-height: 1.6;
-    color: #2e2a25;
+    height: 300px;
     overflow-y: auto;
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-    transition: opacity 1s ease, transform 1s ease;
-  }
-  .letter-container.show {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-  }
-  
-  /* Scrollbar for letter */
-  .letter-container::-webkit-scrollbar {
-    width: 10px;
-  }
-  .letter-container::-webkit-scrollbar-thumb {
-    background-color: #b2875b;
-    border-radius: 6px;
   }
 
   /* Instruction text */
@@ -196,114 +117,81 @@
 </style>
 </head>
 <body>
-  <div class="container" aria-label="Realistic envelope with letter content">
+  <div class="container" aria-label="Folder with letter content">
     <div class="instruction" id="instruction">Click to open</div>
-    <div class="envelope" id="envelope" role="img" aria-hidden="true">
-      <div class="flap" id="flap" role="button" aria-pressed="false" tabindex="0" aria-label="Envelope flap" title="Click to open envelope flap">
-        <div class="heart"></div>
+    <div class="folder" id="folder" role="img" aria-hidden="true">
+      <div class="flap" id="flap" role="button" aria-pressed="false" tabindex="0" aria-label="Folder flap" title="Click to open folder flap"></div>
+
+      <div class="letter-wrapper" id="letterWrapper" aria-hidden="true" aria-live="polite">
+        <article class="letter" id="letter" tabindex="0">
+          <div class="letter-greeting">My Dearest, Jay.</div>
+          <div class="letter-body">
+            <p>In a world that often demands perfection, you chose to accept me completely—imperfections, scars, and all. I recall the nights when the darkness felt unending, and my tears fell without restraint, leaving me exposed and vulnerable, with every defense undone. In my most fragile moments, you held me with a tenderness that made me feel like the most precious part of your world.</p>
+
+            <p>It’s in those quiet, unspoken moments that I realized something deeper than admiration, more profound than fleeting affection—I realised that I love you.</p>
+
+            <p>This message isn’t meant to impress or overwhelm; it’s simply my heart, laid bare for you to see. I’ve thought deeply before writing this because you deserve nothing less than truth, sincerity, and respect. I’m not here to say perfect words or offer grand gestures—I want to be real with you. I’m offering something honest, the hope of building something meaningful, steady, and true—with you.</p>
+
+            <p>You are, to me, a beautiful contradiction—strong yet gentle, radiant yet humble. Even from a distance, you have a way of making life feel a little lighter. The way you bring calm into my chaos, the way your presence makes me feel understood—it’s something rare, and something I deeply treasure.</p>
+
+            <p>And so, I want to ask—would it be alright if I court you? Genuinely, intentionally, and with every bit of respect and sincerity I have. Not just to win your affection, but to truly get to know you. I want to build a connection rooted in trust, honesty, and quiet understanding. I don’t want to rush or pressure you in any way—I just want the chance to show you the kind of love that’s patient, consistent, and real.</p>
+
+            <p>Please don’t feel pressured by the things I say or do. I know this is a lot to take in, and I want you to know that your decision is what truly matters to me. Your peace, your comfort, and your timing will always come first in my heart.</p>
+
+            <p>Because, honestly, I can’t keep this to myself anymore. I like you so much. More than words can explain. And I love you in the purest, most sincere way I know how. You’ve taken up space in my heart in a way no one else has, and it feels natural, comforting, and right.</p>
+
+            <p>I know there’s still so much for me to learn about you—and I want to. I want to be the one you turn to when things get heavy, the calm presence when the world feels overwhelming. I want to be someone who brings peace to your life, not pressure. Joy, not confusion. Someone who grows with you—not just beside you, but with you.</p>
+
+            <p>I do believe in everything or nothing, so I will keep on giving everything. Because loving you this way feels right, even without guarantees, it’s a risk my heart is willing to take—freely, and fully.</p>
+
+            <p>So if your heart is open to it, I’d love the chance to court you—with care, respect, and all the love I already carry for you.</p>
+
+            <p>Whatever your answer, please know that you are deeply admired, truly respected, and endlessly appreciated.</p>
+          </div>
+          <div class="signature">Sincerely,<br/>Precious</div>
+        </article>
       </div>
-      <article class="letter" id="letter" aria-live="polite">
-        <div class="letter-greeting">My Dearest, Jay.</div>
-        <div class="letter-body">
-          <p>In a world that often demands perfection, you chose to accept me completely—imperfections, scars, and all. I recall the nights when the darkness felt unending, and my tears fell without restraint, leaving me exposed and vulnerable, with every defense undone. In my most fragile moments, you held me with a tenderness that made me feel like the most precious part of your world.</p>
-
-          <p>It’s in those quiet, unspoken moments that I realized something deeper than admiration, more profound than fleeting affection—I realised that I love you.</p>
-
-          <p>This message isn’t meant to impress or overwhelm; it’s simply my heart, laid bare for you to see. I’ve thought deeply before writing this because you deserve nothing less than truth, sincerity, and respect. I’m not here to say perfect words or offer grand gestures—I want to be real with you. I’m offering something honest, the hope of building something meaningful, steady, and true—with you.</p>
-
-          <p>You are, to me, a beautiful contradiction—strong yet gentle, radiant yet humble. Even from a distance, you have a way of making life feel a little lighter. The way you bring calm into my chaos, the way your presence makes me feel understood—it’s something rare, and something I deeply treasure.</p>
-
-          <p>And so, I want to ask—would it be alright if I court you? Genuinely, intentionally, and with every bit of respect and sincerity I have. Not just to win your affection, but to truly get to know you. I want to build a connection rooted in trust, honesty, and quiet understanding. I don’t want to rush or pressure you in any way—I just want the chance to show you the kind of love that’s patient, consistent, and real.</p>
-
-          <p>Please don’t feel pressured by the things I say or do. I know this is a lot to take in, and I want you to know that your decision is what truly matters to me. Your peace, your comfort, and your timing will always come first in my heart.</p>
-
-          <p>Because, honestly, I can’t keep this to myself anymore. I like you so much. More than words can explain. And I love you in the purest, most sincere way I know how. You’ve taken up space in my heart in a way no one else has, and it feels natural, comforting, and right.</p>
-
-          <p>I know there’s still so much for me to learn about you—and I want to. I want to be the one you turn to when things get heavy, the calm presence when the world feels overwhelming. I want to be someone who brings peace to your life, not pressure. Joy, not confusion. Someone who grows with you—not just beside you, but with you.</p>
-
-          <p>I do believe in everything or nothing, so I will keep on giving everything. Because loving you this way feels right, even without guarantees, it’s a risk my heart is willing to take—freely, and fully.</p>
-
-          <p>So if your heart is open to it, I’d love the chance to court you—with care, respect, and all the love I already carry for you.</p>
-
-          <p>Whatever your answer, please know that you are deeply admired, truly respected, and endlessly appreciated.</p>
-        </div>
-        <div class="signature">Sincerely,<br/>Precious</div>
-      </article>
     </div>
 
-    <article class="letter-container" id="letterContainer" aria-live="polite" tabindex="0">
-      <div class="letter-greeting">My Dearest, Jay.</div>
-      <div class="letter-body">
-        <p>In a world that often demands perfection, you chose to accept me completely—imperfections, scars, and all. I recall the nights when the darkness felt unending, and my tears fell without restraint, leaving me exposed and vulnerable, with every defense undone. In my most fragile moments, you held me with a tenderness that made me feel like the most precious part of your world.</p>
+    <script>
+      const flap = document.getElementById('flap');
+      const letterWrapper = document.getElementById('letterWrapper');
+      const folder = document.getElementById('folder');
+      const instruction = document.getElementById('instruction');
 
-        <p>It’s in those quiet, unspoken moments that I realized something deeper than admiration, more profound than fleeting affection—I realised that I love you.</p>
+      let isOpen = false;
 
-        <p>This message isn’t meant to impress or overwhelm; it’s simply my heart, laid bare for you to see. I’ve thought deeply before writing this because you deserve nothing less than truth, sincerity, and respect. I’m not here to say perfect words or offer grand gestures—I want to be real with you. I’m offering something honest, the hope of building something meaningful, steady, and true—with you.</p>
+      function openFolder() {
+        if (isOpen) return;
+        isOpen = true;
 
-        <p>You are, to me, a beautiful contradiction—strong yet gentle, radiant yet humble. Even from a distance, you have a way of making life feel a little lighter. The way you bring calm into my chaos, the way your presence makes me feel understood—it’s something rare, and something I deeply treasure.</p>
+        flap.classList.add('open');
+        flap.setAttribute('aria-pressed', 'true');
 
-        <p>And so, I want to ask—would it be alright if I court you? Genuinely, intentionally, and with every bit of respect and sincerity I have. Not just to win your affection, but to truly get to know you. I want to build a connection rooted in trust, honesty, and quiet understanding. I don’t want to rush or pressure you in any way—I just want the chance to show you the kind of love that’s patient, consistent, and real.</p>
+        // Animate letter partial reveal inside the folder (move up)
+        letterWrapper.classList.add('expanded');
+        letterWrapper.setAttribute('aria-hidden', 'false');
 
-        <p>Please don’t feel pressured by the things I say or do. I know this is a lot to take in, and I want you to know that your decision is what truly matters to me. Your peace, your comfort, and your timing will always come first in my heart.</p>
+        // Fade out folder
+        folder.style.opacity = '0';
+        setTimeout(() => {
+          folder.style.display = 'none'; // Hide folder after fade out
+        }, 1000);
 
-        <p>Because, honestly, I can’t keep this to myself anymore. I like you so much. More than words can explain. And I love you in the purest, most sincere way I know how. You’ve taken up space in my heart in a way no one else has, and it feels natural, comforting, and right.</p>
+        // Fade out instruction
+        instruction.style.opacity = '0';
+        setTimeout(() => {
+          instruction.style.display = 'none';
+        }, 600);
+      }
 
-        <p>I know there’s still so much for me to learn about you—and I want to. I want to be the one you turn to when things get heavy, the calm presence when the world feels overwhelming. I want to be someone who brings peace to your life, not pressure. Joy, not confusion. Someone who grows with you—not just beside you, but with you.</p>
-
-        <p>I do believe in everything or nothing, so I will keep on giving everything. Because loving you this way feels right, even without guarantees, it’s a risk my heart is willing to take—freely, and fully.</p>
-
-        <p>So if your heart is open to it, I’d love the chance to court you—with care, respect, and all the love I already carry for you.</p>
-
-        <p>Whatever your answer, please know that you are deeply admired, truly respected, and endlessly appreciated.</p>
-      </div>
-      <div class="signature">Sincerely,<br/>Precious</div>
-    </article>
-  </div>
-
-<script>
-  const flap = document.getElementById('flap');
-  const letter = document.getElementById('letter');
-  const envelope = document.getElementById('envelope');
-  const letterContainer = document.getElementById('letterContainer');
-  const instruction = document.getElementById('instruction');
-
-  let isOpen = false;
-
-  function openEnvelope() {
-    if (isOpen) return;
-    isOpen = true;
-
-    flap.classList.add('open');
-    flap.setAttribute('aria-pressed', 'true');
-    letter.classList.add('open');
-
-    // Hide instruction
-    instruction.style.opacity = '0';
-    setTimeout(() => {
-      instruction.style.display = 'none';
-    }, 600);
-
-    // After letter fade-in, hide envelope and show letterContainer
-    setTimeout(() => {
-      envelope.style.opacity = '0';
-      envelope.style.transform = 'scale(0.9)';
-    }, 2000);
-
-    setTimeout(() => {
-      envelope.style.display = 'none';
-      letterContainer.classList.add('show');
-      letterContainer.focus();
-    }, 3000);
-  }
-
-  flap.addEventListener('click', openEnvelope);
-  flap.addEventListener('keydown', e => {
-    if(e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      openEnvelope();
-    }
-  });
-</script>
+      flap.addEventListener('click', openFolder);
+      flap.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openFolder();
+        }
+      });
+    </script>
 </body>
 </html>
-
