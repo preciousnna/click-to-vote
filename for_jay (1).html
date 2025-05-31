@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Letter to Jay - Fading Folder Reveal</title>
+<title>Letter to Jay - Heart Reveal</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
@@ -20,178 +20,117 @@
     overflow-x: hidden;
   }
 
-  /* Container to hold folder and letter */
+  /* Container for the letter */
   .container {
     position: relative;
     width: 750px;
     max-width: 95vw;
     height: 480px;
-    perspective: 1200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 
-  /* Folder base */
-  .folder {
-    width: 750px;
-    max-width: 100%;
-    height: 480px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow:
-      inset 0 0 18px #b3976b90,
-      0 14px 40px rgba(0,0,0,0.15);
-    position: relative;
-    overflow: hidden;
-    opacity: 1;
-    transition: opacity 1s ease, transform 1s ease;
-    z-index: 10;
-  }
-
-  /* Folder flap */
-  .flap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #fff;
-    border-radius: 8px;
+  /* Heart icon */
+  .heart {
+    width: 60px;
+    height: 60px;
+    background: #b2875b;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
     cursor: pointer;
-    transition: transform 1s ease;
-    z-index: 15;
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
   }
-  .flap.open {
-    transform: rotateY(-180deg);
-  }
-
-  /* Letter wrapper inside folder */
-  .letter-wrapper {
-    position: absolute;
-    top: 160px;
-    left: 50%;
-    width: 680px;
-    height: 60px; /* show only top part initially */
-    max-width: 100%;
-    overflow: hidden;
-    border-radius: 0 0 8px 8px;
-    box-sizing: border-box;
-    transition: transform 1.5s ease 0.5s;
-    background: transparent;
-    z-index: 12;
-  }
-  .letter-wrapper.expanded {
-    transform: translateY(-240px); /* move letter up */
+  .heart:hover {
+    transform: scale(1.1);
   }
 
-  /* Letter inside letter-wrapper */
-  .letter {
+  /* Letter container */
+  .letter-container {
+    display: none; /* Initially hidden */
     background: #fefcf7;
     border: 2px solid #c9b89f;
     box-shadow: 0 6px 20px rgba(0,0,0,0.1);
     color: #2e2a25;
-    padding: 40px 48px 48px 48px;
+    padding: 40px 48px;
     box-sizing: border-box;
     font-family: 'Special Elite', Courier, monospace;
     font-size: 18px;
     line-height: 1.5;
-    border-radius: 0 0 8px 8px;
-    user-select: text;
-    height: 300px;
+    border-radius: 8px;
+    max-width: 100%;
     overflow-y: auto;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  .letter-container.show {
+    display: block; /* Show letter */
+    opacity: 1; /* Fade in */
+    transform: scale(1); /* Scale up */
   }
 
-  /* Instruction text */
-  .instruction {
-    position: absolute;
-    top: -52px;
-    width: 100%;
-    text-align: center;
-    font-weight: 700;
+  /* Letter content styles */
+  .letter-greeting {
+    margin-bottom: 14px;
+    font-weight: 600;
     font-size: 22px;
-    color: #8b6e4b;
-    text-shadow: 0 0 5px #c6b9a3;
-    user-select: none;
-    z-index: 100;
-    pointer-events: none;
-    font-family: 'Poppins', sans-serif;
+  }
+  .letter-body p {
+    margin: 0 0 14px 0;
+    white-space: pre-wrap;
+  }
+  .signature {
+    margin-top: 36px;
+    font-weight: bold;
+    font-size: 1.4rem;
   }
 </style>
 </head>
 <body>
-  <div class="container" aria-label="Folder with letter content">
-    <div class="instruction" id="instruction">Click to open</div>
-    <div class="folder" id="folder" role="img" aria-hidden="true">
-      <div class="flap" id="flap" role="button" aria-pressed="false" tabindex="0" aria-label="Folder flap" title="Click to open folder flap"></div>
+  <div class="container" aria-label="Heart reveal letter content">
+    <div class="heart" id="heart"></div>
+    <div class="letter-container" id="letterContainer" aria-live="polite" tabindex="0">
+      <div class="letter-greeting">My Dearest, Jay.</div>
+      <div class="letter-body">
+        <p>In a world that often demands perfection, you chose to accept me completely—imperfections, scars, and all. I recall the nights when the darkness felt unending, and my tears fell without restraint, leaving me exposed and vulnerable, with every defense undone. In my most fragile moments, you held me with a tenderness that made me feel like the most precious part of your world.</p>
 
-      <div class="letter-wrapper" id="letterWrapper" aria-hidden="true" aria-live="polite">
-        <article class="letter" id="letter" tabindex="0">
-          <div class="letter-greeting">My Dearest, Jay.</div>
-          <div class="letter-body">
-            <p>In a world that often demands perfection, you chose to accept me completely—imperfections, scars, and all. I recall the nights when the darkness felt unending, and my tears fell without restraint, leaving me exposed and vulnerable, with every defense undone. In my most fragile moments, you held me with a tenderness that made me feel like the most precious part of your world.</p>
+        <p>It’s in those quiet, unspoken moments that I realized something deeper than admiration, more profound than fleeting affection—I realised that I love you.</p>
 
-            <p>It’s in those quiet, unspoken moments that I realized something deeper than admiration, more profound than fleeting affection—I realised that I love you.</p>
+        <p>This message isn’t meant to impress or overwhelm; it’s simply my heart, laid bare for you to see. I’ve thought deeply before writing this because you deserve nothing less than truth, sincerity, and respect. I’m not here to say perfect words or offer grand gestures—I want to be real with you. I’m offering something honest, the hope of building something meaningful, steady, and true—with you.</p>
 
-            <p>This message isn’t meant to impress or overwhelm; it’s simply my heart, laid bare for you to see. I’ve thought deeply before writing this because you deserve nothing less than truth, sincerity, and respect. I’m not here to say perfect words or offer grand gestures—I want to be real with you. I’m offering something honest, the hope of building something meaningful, steady, and true—with you.</p>
+        <p>You are, to me, a beautiful contradiction—strong yet gentle, radiant yet humble. Even from a distance, you have a way of making life feel a little lighter. The way you bring calm into my chaos, the way your presence makes me feel understood—it’s something rare, and something I deeply treasure.</p>
 
-            <p>You are, to me, a beautiful contradiction—strong yet gentle, radiant yet humble. Even from a distance, you have a way of making life feel a little lighter. The way you bring calm into my chaos, the way your presence makes me feel understood—it’s something rare, and something I deeply treasure.</p>
+        <p>And so, I want to ask—would it be alright if I court you? Genuinely, intentionally, and with every bit of respect and sincerity I have. Not just to win your affection, but to truly get to know you. I want to build a connection rooted in trust, honesty, and quiet understanding. I don’t want to rush or pressure you in any way—I just want the chance to show you the kind of love that’s patient, consistent, and real.</p>
 
-            <p>And so, I want to ask—would it be alright if I court you? Genuinely, intentionally, and with every bit of respect and sincerity I have. Not just to win your affection, but to truly get to know you. I want to build a connection rooted in trust, honesty, and quiet understanding. I don’t want to rush or pressure you in any way—I just want the chance to show you the kind of love that’s patient, consistent, and real.</p>
+        <p>Please don’t feel pressured by the things I say or do. I know this is a lot to take in, and I want you to know that your decision is what truly matters to me. Your peace, your comfort, and your timing will always come first in my heart.</p>
 
-            <p>Please don’t feel pressured by the things I say or do. I know this is a lot to take in, and I want you to know that your decision is what truly matters to me. Your peace, your comfort, and your timing will always come first in my heart.</p>
+        <p>Because, honestly, I can’t keep this to myself anymore. I like you so much. More than words can explain. And I love you in the purest, most sincere way I know how. You’ve taken up space in my heart in a way no one else has, and it feels natural, comforting, and right.</p>
 
-            <p>Because, honestly, I can’t keep this to myself anymore. I like you so much. More than words can explain. And I love you in the purest, most sincere way I know how. You’ve taken up space in my heart in a way no one else has, and it feels natural, comforting, and right.</p>
+        <p>I know there’s still so much for me to learn about you—and I want to. I want to be the one you turn to when things get heavy, the calm presence when the world feels overwhelming. I want to be someone who brings peace to your life, not pressure. Joy, not confusion. Someone who grows with you—not just beside you, but with you.</p>
 
-            <p>I know there’s still so much for me to learn about you—and I want to. I want to be the one you turn to when things get heavy, the calm presence when the world feels overwhelming. I want to be someone who brings peace to your life, not pressure. Joy, not confusion. Someone who grows with you—not just beside you, but with you.</p>
+        <p>I do believe in everything or nothing, so I will keep on giving everything. Because loving you this way feels right, even without guarantees, it’s a risk my heart is willing to take—freely, and fully.</p>
 
-            <p>I do believe in everything or nothing, so I will keep on giving everything. Because loving you this way feels right, even without guarantees, it’s a risk my heart is willing to take—freely, and fully.</p>
+        <p>So if your heart is open to it, I’d love the chance to court you—with care, respect, and all the love I already carry for you.</p>
 
-            <p>So if your heart is open to it, I’d love the chance to court you—with care, respect, and all the love I already carry for you.</p>
-
-            <p>Whatever your answer, please know that you are deeply admired, truly respected, and endlessly appreciated.</p>
-          </div>
-          <div class="signature">Sincerely,<br/>Precious</div>
-        </article>
+        <p>Whatever your answer, please know that you are deeply admired, truly respected, and endlessly appreciated.</p>
       </div>
+      <div class="signature">Sincerely,<br/>Precious</div>
     </div>
+  </div>
 
-    <script>
-      const flap = document.getElementById('flap');
-      const letterWrapper = document.getElementById('letterWrapper');
-      const folder = document.getElementById('folder');
-      const instruction = document.getElementById('instruction');
+  <script>
+    const heart = document.getElementById('heart');
+    const letterContainer = document.getElementById('letterContainer');
 
-      let isOpen = false;
-
-      function openFolder() {
-        if (isOpen) return;
-        isOpen = true;
-
-        flap.classList.add('open');
-        flap.setAttribute('aria-pressed', 'true');
-
-        // Animate letter partial reveal inside the folder (move up)
-        letterWrapper.classList.add('expanded');
-        letterWrapper.setAttribute('aria-hidden', 'false');
-
-        // Fade out folder
-        folder.style.opacity = '0';
-        setTimeout(() => {
-          folder.style.display = 'none'; // Hide folder after fade out
-        }, 1000);
-
-        // Fade out instruction
-        instruction.style.opacity = '0';
-        setTimeout(() => {
-          instruction.style.display = 'none';
-        }, 600);
-      }
-
-      flap.addEventListener('click', openFolder);
-      flap.addEventListener('keydown', e => {
-        if(e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openFolder();
-        }
-      });
-    </script>
+    heart.addEventListener('click', () => {
+      letterContainer.classList.add('show');
+      heart.style.display = 'none'; // Hide the heart after clicking
+    });
+  </script>
 </body>
 </html>
+
+
+     
